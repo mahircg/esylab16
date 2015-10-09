@@ -1,0 +1,37 @@
+### TEX Temps
+*.out
+*.toc
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+*.lof
+*.lot
+*.lol
+*.dvi
+*.bbl
+*.ps
+*.blg
+*.loc
+*.pyg
+
+### Other Files
+*~
+*.kate-swp
+*.patch
+*.orig
+
+### Assembler Eclipse Stuff
+assembler/.cproject
+assembler/.project
+assembler/.settings/org.eclipse.cdt.managedbuilder.core.prefs
+
+### Assembler Project Compiles
+assembler/obj/*
+assembler/asm
+assembler/test.ram
+assembler/test.map
+
+### test program files
+*.ram
+*.map

@@ -1,0 +1,8 @@
+Release 13.2 Drc O.61xd (lin64)
+Copyright (c) 1995-2011 Xilinx, Inc.  All rights reserved.
+
+Tue Nov  3 18:28:06 2015
+
+drc -z lt16soc_top.ncd lt16soc_top.pcf
+
+DRC detected 0 errors and 0 warnings.

@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=/import/lab/esylab/esylab_01/Desktop/lt16lab/ise/warmup1/lt16soc_top.ncd
+OUTFILE=/import/lab/esylab/esylab_01/Desktop/lt16lab/ise/warmup1/lt16soc_top.bit
+FAMILY=Virtex5
+PART=xc5vlx50t-2ff1136
+WORKINGDIR=/import/lab/esylab/esylab_01/Desktop/lt16lab/ise/warmup1
+LICENSE=ISE
+USER_INFO=174620556_1777490017_210584206_244

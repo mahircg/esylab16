@@ -22,7 +22,9 @@ port(
 	-- external reset button
 	rst		: in std_logic;
 	
-	led		: out std_logic_vector(7 downto 0)
+	led		: out std_logic_vector(7 downto 0);
+	btn      : in  std_logic_vector(6 downto 0);
+	sw       : in  std_logic_vector(7 downto 0)
 );
 end entity lt16soc_top;
 
@@ -34,7 +36,7 @@ architecture RTL of lt16soc_top is
 
 	signal rst_gen	: std_logic;
 
-	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1110_0000_0000_0001";
+	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_0000_0000_0001";
 	constant mst_mask_vector : std_logic_vector(0 to NWBMST-1) := b"1000";
 
 	signal slvo	: wb_slv_out_vector := (others=> wbs_out_none);
@@ -180,6 +182,14 @@ begin
 	)
 	port map(
 		clk,rst_gen,led,slvi(CFG_LED),slvo(CFG_LED)
+	);
+	
+	switchdev : wb_switch
+	generic map (
+		CFG_BADR_SWITCH,CFG_MADR_SWITCH
+	)
+	port map(
+	clk,rst,btn,sw,slvi(CFG_SWITCH),slvo(CFG_SWITCH)
 	);
 
 end architecture RTL;

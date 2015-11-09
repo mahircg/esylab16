@@ -25,6 +25,22 @@ package lt16soc_peripherals is
 		wslvo	:	out	wb_slv_out_type
 	);
 	end component;
+	
+	component wb_switch is
+        generic(
+                memaddr         :       generic_addr_type; 
+                addrmask        :       generic_mask_type 
+        );
+        port(
+                clk             : in  std_logic;
+                rst             : in  std_logic;
+                btn             : in  std_logic_vector(6 downto 0);
+					 sw             : in  std_logic_vector(7 downto 0);
+                wslvi   :       in      wb_slv_in_type;
+                wslvo   :       out     wb_slv_out_type
+        );
+	end component;
+	
 
 end lt16soc_peripherals;
 

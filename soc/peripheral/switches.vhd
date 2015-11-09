@@ -1,9 +1,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+
+library work;
 use work.lt16x32_global.all;
 use work.wishbone.all;
 use work.config.all;
+
 
 entity wb_switch is
         generic(
@@ -32,7 +35,7 @@ begin
 		if(rising_edge(clk)) then
 			if rst = '1' then
 				ack 	<= '0';
-				data 	<= x"00000000";
+				data 	<= x"0000";
 			else
 				if wslvi.stb = '1' and wslvi.cyc = '1' then
 					if wslvi.we = '0' then

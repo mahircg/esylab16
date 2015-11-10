@@ -11,8 +11,8 @@ nop
 .align
 addr:
 .word 0x000F0000
-w_cnt_top:	.word 0x1FC000
-//w_cnt_top:	.word 0x1		//for simulation only
+//w_cnt_top:	.word 0x1FC000
+w_cnt_top:	.word 0x1		//for simulation only
 
 main:
 ldr r0,>addr	//LED addr

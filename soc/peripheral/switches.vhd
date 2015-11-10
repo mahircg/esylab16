@@ -39,8 +39,8 @@ begin
 			else
 				if wslvi.stb = '1' and wslvi.cyc = '1' then
 					if wslvi.we = '0' then
-						data(7 downto 0) <= sw;
-						data(15 downto 8) <= '0' & btn;
+						data(15 downto 8) <= sw;
+						data(7 downto 0) <= '0' & btn;
 					end if;
 					if ack = '0' then
 						ack     <= '1';
@@ -54,8 +54,8 @@ begin
 		end if;
 	end process;
 	
-	wslvo.dat(15 downto 0) <= data;
-	wslvo.dat(31 downto 16) <= (others => '0');
+	wslvo.dat(31 downto 16) <= data;
+	wslvo.dat(15 downto 0) <= (others => '0');
 	
 	wslvo.ack <= ack;
 	wslvo.wbcfg     <= wb_membar(memaddr, addrmask);

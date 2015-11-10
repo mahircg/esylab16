@@ -13,8 +13,8 @@ addr:
 .word 0x000F0000
 switch_addr:
 .word 0x000F0004
-//w_cnt_top:	.word 0x1FC000
-w_cnt_top:	.word 0x00000001		//for simulation only
+w_cnt_top:	.word 0x1FC000
+//w_cnt_top:	.word 0x00000001		//for simulation only
 
 main:
 ldr r0,>addr	//LED addr
@@ -45,8 +45,6 @@ fill:
 
 flush:
 	lsh r1,r1,1
-
-
 	st08 r0,r1
 	call >wait
 	nop

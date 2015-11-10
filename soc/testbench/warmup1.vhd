@@ -50,9 +50,9 @@ BEGIN
 	stimuli: process
 	begin
 		btn <= (others => '0');
-		rst	<= '1';
-		wait for 2*CLK_PERIOD;
 		rst	<= '0';
+		wait for 2*CLK_PERIOD;
+		rst	<= '1';
 		wait for 1200*CLK_PERIOD;
 		sw <= x"01";
 		wait for 1200*CLK_PERIOD;

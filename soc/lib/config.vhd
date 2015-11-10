@@ -9,7 +9,7 @@ package config is
 -----------------------------
 -- RST active level override
 -----------------------------
-	constant RST_ACTIVE_HIGH	:	boolean := true;
+	constant RST_ACTIVE_HIGH	:	boolean := false;
 
 -----------------------------
 -- mem size (dmem, imem)

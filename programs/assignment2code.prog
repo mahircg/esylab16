@@ -21,12 +21,15 @@ ldr r0,>addr	//LED addr
 ldr r9,>switch_addr	//switch address
 addi r6,8		//outer counter top
 clr r7			//wait counter
+clr r11
+clr r10
 ldr r8,>w_cnt_top
 
 out_loop:
 clr r1
 st08 r0,r1
 ld08 r10,r9
+addi r10,1
 call >wait
 nop
 
@@ -60,10 +63,8 @@ flush:
 //subroutine to iterate until counter overflow
 wait:
 	clr r7				//inititalize inner counter
-	inc_i:
-	clr r11
-	inc_ii:
-	cmp neq r11,r10
+inc_i:  clr r11
+inc_ii:	cmp neq r11,r10
 	br true >inc_ii
 	addi r11,1 
 	cmp neq r7,r8

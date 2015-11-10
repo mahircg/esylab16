@@ -189,7 +189,7 @@ begin
 		CFG_BADR_SWITCH,CFG_MADR_SWITCH
 	)
 	port map(
-	clk,rst,btn,sw,slvi(CFG_SWITCH),slvo(CFG_SWITCH)
+	clk,rst_gen,btn,sw,slvi(CFG_SWITCH),slvo(CFG_SWITCH)
 	);
 
 end architecture RTL;

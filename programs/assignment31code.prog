@@ -1,0 +1,83 @@
+reset:
+br always >main
+nop
+hardfault:
+reti
+nop
+memfault:
+reti
+nop
+
+.align
+lcd_addr: .word 0x000F0008
+cnt_top_1us:  .word 0x00000011		//Approx. 17 cycles for 10us delay
+cnt_top_40ms: .word 0x000A2C2B
+cnt_top_37us: .word 0x00001817
+cnt_top_1_52ms: .word 0x0003DD95
+enable_mask: .word 0x00000400
+disable_mask: .word 0xFFFFFBFF
+cmd_func_set: .word 0x00000018
+cmd_on_off: .word 0x0000000E
+cmd_clear: .word 0x00000001
+cmd_entry_set: .word 0x00000006
+
+main: 
+	ldr r0,>lcd_addr
+	ldr r8,>cnt_top
+
+send_enabled:			//Subroutine expects command to be stored in r1
+	ldr r2,>enable_mask
+	or r1,r1,r2		//Set enable bit
+	st16 r0,r1
+	call wait
+	nop
+	ret
+	nop
+
+send_disabled:
+	ldr r2,>disable_mask
+	and r1,r1,r2
+	st16 r0,r1
+	call wait
+	nop
+	ret
+	nop	
+init:
+	ldr r8,cnt_top_40ms
+	call wait
+	nop
+	ldr r1,>cmd_func_set
+	call send_enabled
+	nop
+
+	ldr r8,>cnt_top_37us
+	call wait
+	nop
+	ldr r1,>cmd_on_off
+	call send_enabled
+	nop
+	
+	call wait
+	nop
+	ldr r1,>cmd_clear
+	call send_enabled
+	nop
+
+	ldr r8,>cnt_top_1_52ms
+	call wait
+	nop
+	ldr r1,>cmd_entry
+	call send_enabled
+	nop
+
+	ret
+	nop
+
+wait:
+	clr r7                          //inititalize inner counter
+        inc_i:
+        cmp neq r7,r8
+        br true >inc_i          //if i=cnt_top
+        addi r7,1
+        ret                                     //else
+        nop

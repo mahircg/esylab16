@@ -16,20 +16,58 @@ cnt_top_37us: .word 0x00001817
 cnt_top_1_52ms: .word 0x0003DD95
 enable_mask: .word 0x00000400
 disable_mask: .word 0xFFFFFBFF
-cmd_func_set: .word 0x00000018
+cmd_func_set: .word 0x00000038
 cmd_on_off: .word 0x0000000E
 cmd_clear: .word 0x00000001
 cmd_entry_set: .word 0x00000006
+ddr_start_addr: .word 0x00000080
+.address 0x70
+string_first: .word 0x41737365
+.address 0x74
+string_second: .word 0x6D626C65
+.address 0x78
+string_third: .word 0x7220726F
+.address 0x7C
+string_fourth: .word 0x636B7321
+
 
 main: 
 	ldr r0,>lcd_addr
-	ldr r8,>cnt_top
+	call >init
+	nop
+	clr r10			//index variable
+	clr r11			//array size=16
+	clr r5
+	addi r5,0x70		//base address for char array
+	ldr r6,>ddr_start_addr	//DDR address initialized to 0x00
+  inc_addr:
+	clr r1
+	add r1,r1,r6		
+	call >send_enabled
+	nop
+	ldr r8,>cnt_top_37us
+	call >wait
+	nop
+	ld08 r1,r5
+	call >send_enabled
+	nop
+	addi r5,1
+	addi r6,1
+	cmp neq r10,r11
+        br true >inc_addr          //if i=cnt_top
+        addi r10,1
+	
+	
+
+	
+	
 
 send_enabled:			//Subroutine expects command to be stored in r1
 	ldr r2,>enable_mask
 	or r1,r1,r2		//Set enable bit
 	st16 r0,r1
-	call wait
+	ldr r8,>cnt_top_1us
+	call >wait
 	nop
 	ret
 	nop
@@ -38,36 +76,38 @@ send_disabled:
 	ldr r2,>disable_mask
 	and r1,r1,r2
 	st16 r0,r1
-	call wait
+	ldr r8,>cnt_top_1us
+	call >wait
 	nop
 	ret
 	nop	
 init:
-	ldr r8,cnt_top_40ms
-	call wait
+	ldr r8,>cnt_top_40ms
+	call >wait
 	nop
 	ldr r1,>cmd_func_set
-	call send_enabled
+	call >send_enabled
 	nop
 
 	ldr r8,>cnt_top_37us
-	call wait
+	call >wait
 	nop
 	ldr r1,>cmd_on_off
-	call send_enabled
+	call >send_enabled
 	nop
+
 	
-	call wait
+	call >wait
 	nop
 	ldr r1,>cmd_clear
-	call send_enabled
+	call >send_enabled
 	nop
 
 	ldr r8,>cnt_top_1_52ms
-	call wait
+	call >wait
 	nop
-	ldr r1,>cmd_entry
-	call send_enabled
+	ldr r1,>cmd_entry_set
+	call >send_enabled
 	nop
 
 	ret

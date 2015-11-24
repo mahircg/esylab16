@@ -41,6 +41,24 @@ package lt16soc_peripherals is
         );
 	end component;
 	
+	component wb_lcd is 
+			generic(
+				memaddr		: generic_addr_type;
+				addrmask		: generic_mask_type
+			);
+			port(
+				clk			: in std_logic;
+				rst			: in std_logic;
+
+				dataLCD		: inout std_logic_vector(7 downto 0);
+				enableLCD	: out std_logic;
+				rsLCD		: out std_logic;
+				rwLCD		: out std_logic;
+
+				wslvi		: in wb_slv_in_type;
+				wslvo		: out wb_slv_out_type
+			);
+		end component;	
 
 end lt16soc_peripherals;
 

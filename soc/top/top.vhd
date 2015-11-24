@@ -24,6 +24,10 @@ port(
 	
 	led		: out std_logic_vector(7 downto 0);
 	btn      : in  std_logic_vector(6 downto 0);
+	enableLCD: out std_logic;
+	rsLCD		: out std_logic;
+	rwLCD		: out std_logic;
+	dataLCD	: inout std_logic_vector(7 downto 0);
 	sw       : in  std_logic_vector(7 downto 0)
 );
 end entity lt16soc_top;
@@ -190,6 +194,14 @@ begin
 	)
 	port map(
 	clk,rst_gen,btn,sw,slvi(CFG_SWITCH),slvo(CFG_SWITCH)
+	);
+	
+	lcddev : wb_lcd
+	generic map (
+			CFG_BADR_LCD, CFG_MADR_LCD
+		)
+	port map(
+	clk,rst_gen,dataLCD,enableLCD,rsLCD,rwLCD,slvi(CFG_LCD),slvo(CFG_LCD)
 	);
 
 end architecture RTL;

@@ -2,13 +2,17 @@ reset:
 br always >main
 nop
 hardfault:
+ldr r11,>dummy
 reti
 nop
 memfault:
+ldr r11,>dummy
+addi r11,1
 reti
 nop
 
 .align
+dummy: .word 0xFFFFFFFE
 lcd_addr: .word 0x000F0008
 cnt_top_1us:  .word 0x00000011		//Approx. 17 cycles for 10us delay
 cnt_top_40ms: .word 0x000A2C2B
@@ -56,32 +60,37 @@ main:
 	cmp neq r10,r11
         br true >inc_addr          //if i=cnt_top
         addi r10,1
-	
+  end:  br always >end
+	nop	
 	
 
 	
 	
 
 send_enabled:			//Subroutine expects command to be stored in r1
+	clr r12
+	add r12,r12,r13
 	ldr r2,>enable_mask
 	or r1,r1,r2		//Set enable bit
-	st16 r0,r1
+	st32 r0,r1
 	ldr r8,>cnt_top_1us
 	call >wait
 	nop
-	ret
+	br always r12
 	nop
 
 send_disabled:
 	ldr r2,>disable_mask
 	and r1,r1,r2
-	st16 r0,r1
+	st32 r0,r1
 	ldr r8,>cnt_top_1us
 	call >wait
 	nop
 	ret
 	nop	
 init:
+	clr r9
+	add r9,r9,r13	
 	ldr r8,>cnt_top_40ms
 	call >wait
 	nop
@@ -110,7 +119,7 @@ init:
 	call >send_enabled
 	nop
 
-	ret
+	br always r9
 	nop
 
 wait:

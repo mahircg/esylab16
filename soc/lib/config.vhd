@@ -46,7 +46,7 @@ package config is
 	constant CFG_MADR_DMEM		: generic_mask_type := 16#3FFFFF# - (256 -1); -- uses 6 word-bits, size 256 byte
 	constant CFG_MADR_LED		: generic_mask_type := 16#3FFFFF#; -- size=1 byte
 	constant CFG_MADR_SWITCH	: generic_mask_type := 16#3FFFFF# - (4 -1); -- size=4 bytes
-	constant CFG_MADR_LCD		: generic_mask_type := 16#3FFFFF# - (2 -1); -- size=2 bytes
+	constant CFG_MADR_LCD		: generic_mask_type := 16#3FFFFF# - (4 -1); -- size=4 bytes
 end package config;
 
 package body config is

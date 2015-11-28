@@ -39,13 +39,13 @@ architecture RTL of lt16soc_top is
 	--//////////////////////////////////////////////////////
 
 	signal rst_gen	: std_logic;
-
-	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_0000_0000_0001";
+	
+	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_1000_0000_0000";
 	constant mst_mask_vector : std_logic_vector(0 to NWBMST-1) := b"1000";
-
+	
 	signal slvo	: wb_slv_out_vector := (others=> wbs_out_none);
 	signal msto	: wb_mst_out_vector := (others=> wbm_out_none);
-
+	
 	signal slvi	: wb_slv_in_vector := (others=> wbs_in_none);
 	signal msti	: wb_mst_in_vector := (others=> wbm_in_none);
 

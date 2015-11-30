@@ -31,6 +31,7 @@ ARCHITECTURE behav OF wb_lcd_adv IS
 	--Constant definitions : cycles
 	constant NUM_CYCLES_40MS : natural := 4000000;
 	constant NUM_CYCLES_37US : natural := 3700;
+	constant NUM_CYCLES_1_52MS : natural := 152000;
 	constant NUM_CYCLES_1_5MS: natural := 150000;
 	constant NUM_CYCLES_500NS: natural := 50;
 	constant NUM_CYCLES_700NS: natural := 70;
@@ -41,45 +42,252 @@ ARCHITECTURE behav OF wb_lcd_adv IS
 	constant CMD_CLEAR : std_logic_vector(7 downto 0) := X"01"; 
 	constant CMD_ENTRY_SET : std_logic_vector(7 downto 0) := X"06";
 	--State definitions for FSMs
-	type lcd_fsm_type is (lcd_rst,ifs,w1,fs1,w2,fs2,wnd,rw,b);
-	type enable_fsm_type is (enable_rst,e,eh,el);
+	type lcd_fsm_type is (ifs,w1,fs1,w2,fs2,wnd,rw,b);
+	type enable_fsm_type is (e,eh,el);
 	
 	--State declarations
-	signal lcd_ps,lcd_ns				:lcd_fsm_type;
-	signal enable_ps,enable_ns		:enable_fsm_type;
+	signal lcd_state				:lcd_fsm_type;
+	signal enable_state			:enable_fsm_type;
 	
 	--Counter declarations
-	signal lcd_counter				: integer range 0 to NUM_CYCLES_40MS;
-	signal enable_counter  			: integer range 0 to NUM_CYCLES_700NS;
+	signal count				: integer range 0 to NUM_CYCLES_40MS;
+	signal count_e  			: integer range 0 to NUM_CYCLES_700NS;
 	
 	--Shared signals
 	signal e_edge : std_logic;
 	signal cycle_e: std_logic;
 	
+	--E-detector signals
+	signal E : std_logic;
+	
+	
+	
 	--LCD controller signals
-	
-	
+	signal busy : std_logic;
+	signal new_data : std_logic;
 
 	signal lcd_reg	: std_logic_vector(10 downto 0);
 	signal ack		: std_logic;
 
 BEGIN
 
-
-sequential_proc: process(rst,clk)
+lcd_proc: process(clk)
 begin
 	if rising_edge(clk) then
 		if rst = '1' then
-			lcd_ps <= lcd_rst;
-			enable_ps <=enable_rst;
+			lcd_state <= ifs;
+			busy <= '1';
+			count <= 0;
 		else
-			lcd_ps <= lcd_ns;
-			enable_ps <= enable_ns;
+			case lcd_state is
+			when ifs =>
+				if count /= NUM_CYCLES_40MS then
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= (others => 'Z');
+					lcd_state <= ifs;
+				else
+					count <= 0;
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_FUNC_SET;
+					lcd_state <= w1;
+				end if;
+			when w1 =>
+				if e_edge = '0' then
+					cycle_e <= '1';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_FUNC_SET;
+					lcd_state <= w1;
+				else
+					cycle_e <= '0';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_FUNC_SET;
+					lcd_state <= fs1;
+				end if;
+			when fs1 =>
+				if count /= NUM_CYCLES_37US then
+					rwLCD <= '0';
+					rsLCD <= '0';
+					cycle_e <= '0';
+					dataLCD <= (others => 'Z');
+					lcd_state <= fs1;
+				else
+					count <= 0;
+					rwLCD <= '0';
+					rsLCD <= '0';
+					cycle_e <= '1';
+					dataLCD <= CMD_ON_OFF;
+					lcd_state <= w2;
+				end if;
+			when w2 =>
+				if e_edge = '0' then
+					cycle_e <= '1';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_ON_OFF;
+					lcd_state <= w2;
+				else
+					cycle_e <= '0';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_ON_OFF;
+					lcd_state <= fs2;
+				end if;
+			when fs2 =>
+				if count /= NUM_CYCLES_37US then
+					rwLCD <= '0';
+					rsLCD <= '0';
+					cycle_e <= '0';
+					dataLCD <= (others => 'Z');
+					lcd_state <= fs1;
+				else
+					count <= 0;
+					rwLCD <= '0';
+					rsLCD <= '0';
+					cycle_e <= '1';
+					dataLCD <= CMD_CLEAR;
+					lcd_state <= w3;
+				end if;
+			when w3 =>
+				if e_edge = '0' then
+					cycle_e <= '1';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_CLEAR;
+					lcd_state <= w3;
+				else
+					cycle_e <= '0';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_CLEAR;
+					lcd_state <= fs3;
+				end if;
+			when fs3 =>
+				if count /= NUM_CYCLES_1_52MS then
+					rwLCD <= '0';
+					rsLCD <= '0';
+					cycle_e <= '0';
+					dataLCD <= (others => 'Z');
+					lcd_state <= fs3;
+				else
+					count <= 0;
+					rwLCD <= '0';
+					rsLCD <= '0';
+					cycle_e <= '1';
+					dataLCD <= CMD_ENTRY_SET;
+					lcd_state <= w4;
+				end if;
+			when w4 =>
+				if e_edge = '0' then
+					cycle_e <= '1';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= CMD_ENTRY_SET;
+					lcd_state <= w3;
+				else
+					cycle_e <= '0';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= (others => 'Z');
+					lcd_state <= wnd;
+				end if;
+			when wnd =>
+				if new_data = '0' then
+					cycle_e <= '0';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					dataLCD <= (others => 'Z');
+					busy <= '0';
+					lcd_state <= wnd;
+				else
+					cycle_e <= '1';
+					rsLCD		<= lcd_reg(9);
+					rwLCD		<= lcd_reg(8);
+					dataLCD	<= lcd_reg(7 downto 0) when lcd_reg(8) = '0' else "ZZZZZZZZ";
+					lcd_state <= rw;
+				end if;
+			when rw =>
+				rsLCD		<= lcd_reg(9);
+				rwLCD		<= lcd_reg(8);
+				dataLCD	<= lcd_reg(7 downto 0) when lcd_reg(8) = '0' else "ZZZZZZZZ";
+				if e_edge = '0' then
+					cycle_e <= '1';
+					lcd_state <= rw;
+				elsif new_data = '1' then 
+					cycle_e <= '0';
+					lcd_state <= b;
+				end if;
+			when b =>
+				if count /= NUM_CYCLES_1_5MS then
+					cycle_e <= '0';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					busy <=  '1';
+					lcd_state <= b;
+				else
+					cycle_e <= '1';
+					rwLCD <= '0';
+					rsLCD <= '0';
+					busy <=  '1';
+					lcd_state <= wnd;
+				end if;
+			end case;
 		end if;
-	end if;
+	end if;				
 end process;
 
 
+e_proc: process(clk)
+begin
+	if rising_edge(clk) then
+		if rst = '1' then
+			cycle_e <= '0';
+			enable_state <= e;
+		else
+			case enable_state is
+			when e => 
+				if cycle_e = '0' then
+					count_e <= 0;
+					E			<= '0';
+					e_edge 	<= '0';
+					enable_state <= e;
+				else
+					E			<= '1';
+					e_edge	<= '0';
+					count_e <= 1;
+					enable_state <= eh;
+				end if;
+			when eh =>
+				if count_e /= NUM_CYCLES_500NS then
+					E 			<= '1';
+					e_edge	<= '0';
+					count_e <= count_e + 1;
+					enable_state <= eh;
+				else
+					E 			<= '0';
+					e_edge	<= '1';
+					count_e <= 0;
+					enable_state <= el;
+				end if;
+			when el =>
+				if count_e /= NUM_CYCLES_700NS then
+					E 			<= '0';
+					e_edge	<= '0';
+					count_e <= count_e + 1;
+					enable_state <= eh;
+				else
+					E 			<= '0';
+					e_edge	<= '0';
+					count_e <= 0;
+					enable_state <= e;
+				end if;
+			end case;
+		end if;
+	end if;
+end process;
 
 
 
@@ -94,6 +302,7 @@ end process;
 				if wslvi.stb = '1' and wslvi.cyc = '1' then
 
 					if wslvi.we = '1' then
+						new_data <= '1';
 						lcd_reg	<= dec_wb_dat(wslvi.sel,wslvi.dat)(10 downto 0);
 					end if;
 
@@ -104,6 +313,7 @@ end process;
 					end if;
 				else
 					ack			<= '0';
+					new_data 	<= '0';
 				end if;
 			end if;
 		end if;
@@ -117,9 +327,6 @@ end process;
 	wslvo.wbcfg				<= wb_membar(memaddr, addrmask);
 	wslvo.ack				<= ack;
 
-	enableLCD	<= lcd_reg(10);
-	rsLCD		<= lcd_reg(9);
-	rwLCD		<= lcd_reg(8);
-	dataLCD		<= lcd_reg(7 downto 0) when lcd_reg(8) = '0' else "ZZZZZZZZ";
+	enableLCD	<= E;
 
 END ARCHITECTURE;

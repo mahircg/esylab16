@@ -15,8 +15,8 @@ nop
 dummy: .word 0xFFFFFFFE
 lcd_addr: .word 0x000F0008
 cnt_top_10us:  .word 0x0000014E		//Approx. 334 cycles for 10us delay
-cnt_top_40ms: .word 0x0000014E
-//cnt_top_40ms: .word 0x00145856
+//cnt_top_40ms: .word 0x0000014E
+cnt_top_40ms: .word 0x00145856
 cnt_top_37us: .word 0x000004D2
 cnt_top_1_52ms: .word 0x000C5EA
 enable_mask: .word 0x00000400

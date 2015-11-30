@@ -1,0 +1,64 @@
+reset:
+br always >main
+nop
+hardfault:
+nop
+memfault:
+reti
+nop
+
+.align
+lcd_addr: .word 0x000F0008
+ddr_start_addr: .word 0x00000080
+rs_mask: .word 0x00000200
+
+.address 0x70
+string_first: .word 0x48617264
+.address 0x74
+string_second: .word 0x77617265
+.address 0x78
+string_third: .word 0x2072756C
+.address 0x7C
+string_fourth: .word 0x7A210000
+
+
+main: 
+	ldr r0,>lcd_addr
+	clr r10			//index variable
+	clr r11			//array size=16
+	addi r11,13
+	clr r5
+	addi r5,0x70		//base address for char array
+	ldr r6,>ddr_start_addr
+	ldr r12, >rs_mask
+	clr r4
+
+poll1:	ld32 r3,r0
+        rsh r3,r3,11
+        cmp neq r3,r4
+        br true >poll1
+        nop
+	st32 r0,r6	
+inc_addr:
+	
+poll2:	ld32 r3,r0
+	rsh r3,r3,11
+	cmp neq r3,r4
+	br true >poll2
+	nop
+ 
+	ld08 r1,r5
+	or r1,r1,r12
+
+	st32 r0,r1
+	addi r5,1
+	cmp neq r10,r11
+        br true >inc_addr          //if i=cnt_top
+        addi r10,1
+
+end:  br always >end
+	nop	
+	
+
+	
+

@@ -41,7 +41,7 @@ package lt16soc_peripherals is
         );
 	end component;
 	
-	component wb_lcd is 
+	component wb_lcd_adv is 
 			generic(
 				memaddr		: generic_addr_type;
 				addrmask		: generic_mask_type

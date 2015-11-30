@@ -1,5 +1,5 @@
 
-AS=../assembler/asm
+AS=../assembler/asm.exe
 RM= rm -f
 
 SRCS= $(wildcard *.prog)

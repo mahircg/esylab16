@@ -28,7 +28,7 @@ ARCHITECTURE sim OF warmup1_tb IS
 
 	COMPONENT lt16soc_top IS
 		generic(
-			programfilename : string := "programs/assignment31code.ram"
+			programfilename : string := "C:\Users\Mahircan\Ders\embedded_systems_lab\lt16lab\programs\assignment31code.ram"
 		);
 		port(
 			clk		: in  std_logic;

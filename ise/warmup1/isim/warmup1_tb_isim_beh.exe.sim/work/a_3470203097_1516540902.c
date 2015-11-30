@@ -10,7 +10,7 @@
 /*  \___\/\___\                                                    */
 /***********************************************************************/
 
-/* This file is designed for use with ISim build 0xb4d1ced7 */
+/* This file is designed for use with ISim build 0x7708f090 */
 
 #define XSI_HIDE_SYMBOL_SPEC true
 #include "xsi.h"
@@ -21,12 +21,12 @@
 #include <malloc.h>
 #define alloca _alloca
 #endif
-static const char *ng0 = "/import/lab/esylab/esylab_01/Desktop/lt16lab/soc/core/decoder_32bit.vhd";
+static const char *ng0 = "C:/Users/Mahircan/Ders/embedded_systems_lab/lt16lab/soc/core/decoder_32bit.vhd";
 extern char *WORK_P_1507036401;
 
-char *work_p_1507036401_sub_13594053034709766023_3868518172(char *);
-char *work_p_1507036401_sub_13594053034709767145_3868518172(char *);
-char *work_p_1507036401_sub_13594053034709768267_3868518172(char *);
+char *work_p_1507036401_sub_1068650375_3868518172(char *);
+char *work_p_1507036401_sub_1068651497_3868518172(char *);
+char *work_p_1507036401_sub_1068652619_3868518172(char *);
 
 
 static void work_a_3470203097_1516540902_p_0(char *t0)
@@ -40,8 +40,8 @@ static void work_a_3470203097_1516540902_p_0(char *t0)
 
 LAB0:    xsi_set_current_line(23, ng0);
 
-LAB3:    t1 = work_p_1507036401_sub_13594053034709766023_3868518172(WORK_P_1507036401);
-    t2 = (t0 + 3472);
+LAB3:    t1 = work_p_1507036401_sub_1068650375_3868518172(WORK_P_1507036401);
+    t2 = (t0 + 3480);
     t3 = (t2 + 56U);
     t4 = *((char **)t3);
     t5 = (t4 + 56U);
@@ -66,8 +66,8 @@ static void work_a_3470203097_1516540902_p_1(char *t0)
 
 LAB0:    xsi_set_current_line(24, ng0);
 
-LAB3:    t1 = work_p_1507036401_sub_13594053034709767145_3868518172(WORK_P_1507036401);
-    t2 = (t0 + 3536);
+LAB3:    t1 = work_p_1507036401_sub_1068651497_3868518172(WORK_P_1507036401);
+    t2 = (t0 + 3544);
     t3 = (t2 + 56U);
     t4 = *((char **)t3);
     t5 = (t4 + 56U);
@@ -92,8 +92,8 @@ static void work_a_3470203097_1516540902_p_2(char *t0)
 
 LAB0:    xsi_set_current_line(25, ng0);
 
-LAB3:    t1 = work_p_1507036401_sub_13594053034709768267_3868518172(WORK_P_1507036401);
-    t2 = (t0 + 3600);
+LAB3:    t1 = work_p_1507036401_sub_1068652619_3868518172(WORK_P_1507036401);
+    t2 = (t0 + 3608);
     t3 = (t2 + 56U);
     t4 = *((char **)t3);
     t5 = (t4 + 56U);
@@ -117,7 +117,7 @@ static void work_a_3470203097_1516540902_p_3(char *t0)
 
 LAB0:    xsi_set_current_line(26, ng0);
 
-LAB3:    t1 = (t0 + 3664);
+LAB3:    t1 = (t0 + 3672);
     t2 = (t1 + 56U);
     t3 = *((char **)t2);
     t4 = (t3 + 56U);

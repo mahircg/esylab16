@@ -1,1 +1,1 @@
--intstyle "ise" -incremental -lib "secureip" -o "/import/lab/esylab/esylab_01/Desktop/lt16lab/ise/warmup1/warmup1_tb_isim_beh.exe" -prj "/import/lab/esylab/esylab_01/Desktop/lt16lab/ise/warmup1/warmup1_tb_beh.prj" "work.warmup1_tb" 
+-intstyle "ise" -incremental -lib "secureip" -o "C:/Users/Mahircan/Ders/embedded_systems_lab/lt16lab/ise/warmup1/warmup1_tb_isim_beh.exe" -prj "C:/Users/Mahircan/Ders/embedded_systems_lab/lt16lab/ise/warmup1/warmup1_tb_beh.prj" "work.warmup1_tb" 

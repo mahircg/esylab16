@@ -14,7 +14,12 @@
 *.blg
 *.loc
 *.pyg
-
+*.obj
+*.vdb
+*.zip
+*.html
+*.didat
+*.vho
 ### Other Files
 *~
 *.kate-swp

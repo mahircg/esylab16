@@ -37,6 +37,7 @@ package lt16soc_peripherals is
                 btn             : in  std_logic_vector(6 downto 0);
 					 sw             : in  std_logic_vector(7 downto 0);
                 wslvi   :       in      wb_slv_in_type;
+					 sw_irq			: out std_logic;
                 wslvo   :       out     wb_slv_out_type
         );
 	end component;

@@ -201,7 +201,7 @@ begin
 			CFG_BADR_LCD, CFG_MADR_LCD
 		)
 	port map(
-	clk,rst_gen,dataLCD,enableLCD,rsLCD,rwLCD,slvi(CFG_LCD),slvo(CFG_LCD)
+	clk,rst_gen,dataLCD,enableLCD,rsLCD,rwLCD,slvi(CFG_LCD),sw_irg => irq_lines(3),slvo(CFG_LCD)
 	);
 
 end architecture RTL;

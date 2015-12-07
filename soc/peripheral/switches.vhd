@@ -31,17 +31,28 @@ signal irq_enabled: std_logic_vector(15 downto 0);
 signal change: std_logic;
 signal irq : std_logic;
 
+signal sw_reg : std_logic_vector(7 downto 0);
+signal bt_reg : std_logic_vector(6 downto 0);
+
 begin
-	irq_proc: process(sw,btn,irq,rst)
+
+	irq_proc: process(clk)
 	begin
-		if rst = '1' then
-			change <= '0';
-		elsif btn'event or sw'event then
-			change <= '1';
-		elsif rising_edge(irq) then
-			change <= '0';
+		if rising_edge(clk) then
+			if rst = '1' then
+				change <= '0';
+			else
+				if sw_reg /= sw or bt_reg /= btn then
+					change <= '1';
+				else
+					change <= '0';
+				end if;
+				sw_reg <= sw;
+				bt_reg <= btn;
+			end if;
 		end if;
 	end process;
+	
 	
 	process(clk)
 	begin

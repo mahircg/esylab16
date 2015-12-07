@@ -1,0 +1,43 @@
+reset: 		br always >main
+			nop
+hardfault:	reti
+			nop
+memfault:	reti
+			nop
+sw_irq:		br always >sw_irq_handler
+
+
+sw_addr: .word 0x000F0004
+led_addr: .word 0x000F0000
+
+.align
+.address 0x40 
+axialmeter	:.word 0x00000000
+prevaxialstate:.word 0x00000000
+
+//uses r3 as axialmeter and r4 as prevaxialmeter
+sw_irq_handler:		
+		ld08 r5,r2		//Copy axialmeter into prevaxialstate
+		st08 r3,r5
+		ld16 r5,r1		//Read axialmeter
+		rsh r5,r5,8
+		st08 r2,r5		//Store axialmeter value in mem
+		reti
+
+main:
+		clr r12
+		addi r12,0x40
+		ldr r0,>led_addr
+		ldr r1,>sw_addr
+		ldr r2,0x40		//Assign pointer adresses
+		ldr r3,0x44
+		
+		clr r4
+loop:	ld08 r5,r2		//Read values from pointed addresses
+		ld08 r6,r3
+		cmp eq r5,r6
+		br true >write_led
+		
+write_led:		ldr r0,r4
+		br always,>loop
+		

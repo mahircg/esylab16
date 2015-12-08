@@ -28,7 +28,7 @@ ARCHITECTURE sim OF warmup1_tb IS
 
 	COMPONENT lt16soc_top IS
 		generic(
-			programfilename : string := "C:\Users\Mahircan\Ders\embedded_systems_lab\lt16lab\programs\assignment4code.ram"
+			programfilename : string := "programs/assignment4_code.ram"
 		);
 		port(
 			clk		: in  std_logic;
@@ -67,13 +67,16 @@ BEGIN
 	stimuli: process
 	begin
 		rst <= '0';
+		btn <="0000000";
 		wait for 2*CLK_PERIOD;
 		rst <= '1';
-		wait for 45 ns;
-		btn <="0011001";
-		wait for 200 ns;
-		btn <="0011111";
-		wait for 200 ns;
+		wait for 1 us;
+		btn <="0000000";
+		wait for 1 us;
+		btn <="0001000";
+		wait for 1 us;
+		btn <="0000000";
+		wait for 1 us;
 		assert false report "Simulation terminated!" severity failure;
 	end process stimuli;
 

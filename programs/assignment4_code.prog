@@ -51,19 +51,22 @@ loop:
 		br true >loop
 		nop
 		clr r11		//If PC is at this instr., we have a direction change
-		ldr r11,0x10	//Check if it is left
+		addi r11,0x10	//Check if it is left
 		cmp eq r7,r11
 		br true >l_shift 
 		nop
-		ldr r11,0x20
+		clr r11
+		addi r11,0x20
 		cmp eq r7,r11
 		br true >r_shift
 		nop
-		ldr r11,0x04
+		clr r11
+		addi r11,0x08
 		cmp eq r7,r11
 		br true >increment
 		nop
-		ldr r11,0x40
+		clr r11
+		addi r11,0x40
 		cmp eq r7,r11
 		br true >decrement
 		nop 

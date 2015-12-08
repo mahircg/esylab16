@@ -14,7 +14,7 @@ use work.lt16soc_peripherals.all;
 
 entity lt16soc_top is
 generic(
-	programfilename : string := "programs/assignment32code.ram" -- see "Synthesize XST" process properties for actual value ("-generics" in .xst file)!
+	programfilename : string := "programs/assignment4_code.ram" -- see "Synthesize XST" process properties for actual value ("-generics" in .xst file)!
 );
 port(
 	-- clock signal
@@ -54,6 +54,8 @@ architecture RTL of lt16soc_top is
 
 	signal irq2core   : irq_core;
 	signal core2irq   : core_irq;
+	
+	signal btn_debounced: std_logic_vector(6 downto 0);
 
 	signal irq_lines  : std_logic_vector((2 ** irq_num_width) - 1 downto 0) := (others=>'0');
 
@@ -193,7 +195,7 @@ begin
 		CFG_BADR_SWITCH,CFG_MADR_SWITCH
 	)
 	port map(
-	clk,rst_gen,btn,sw,slvi(CFG_SWITCH),slvo(CFG_SWITCH)
+	clk,rst_gen,btn_debounced,sw,slvi(CFG_SWITCH),irq_lines(3),slvo(CFG_SWITCH)
 	);
 	
 	lcddev : wb_lcd_adv
@@ -201,7 +203,13 @@ begin
 			CFG_BADR_LCD, CFG_MADR_LCD
 		)
 	port map(
-	clk,rst_gen,dataLCD,enableLCD,rsLCD,rwLCD,slvi(CFG_LCD),sw_irg => irq_lines(3),slvo(CFG_LCD)
+	clk,rst_gen,dataLCD,enableLCD,rsLCD,rwLCD,slvi(CFG_LCD),slvo(CFG_LCD)
 	);
+	
+	GEN_DEBOUNCER:
+	for i in 0 to 6 generate
+	begin
+		debouncer_X : debounce generic map(counter_size => 19) port map(clk,btn(i),btn_debounced(i));
+	end generate GEN_DEBOUNCER;
 
 end architecture RTL;

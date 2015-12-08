@@ -33,7 +33,7 @@ begin
 		if clk'event and clk='1' then
 			if rst = '1' then
 				ack		<= '0';
-				data	<= x"0F";
+				data	<= x"00";
 			else
 				if wslvi.stb = '1' and wslvi.cyc = '1' then
 					if wslvi.we='1' then

@@ -5,6 +5,7 @@ hardfault:	reti
 memfault:	reti
 			nop
 sw_irq:		br always >sw_irq_handler
+		nop
 
 .align
 sw_addr: .word 0x000F0004
@@ -13,7 +14,7 @@ led_addr: .word 0x000F0000
 
 
 .align
-sp_init:   .word 0x40C
+sp_init:   .word 0x410
 ptr_axialmeter: .word 0x400
 ptr_prev_state: .word 0x404
 
@@ -23,7 +24,9 @@ sw_irq_handler:
 		st08 r3,r5
 		ld16 r5,r1		//Read axialmeter
 		st08 r2,r5		//Store axialmeter value in mem
+
 		reti
+		nop
 
 main:
 		ldr sp, >sp_init
@@ -33,21 +36,53 @@ main:
 		ldr r2,>ptr_axialmeter		//Assign pointer adresses
 		ldr r3,>ptr_prev_state	
 		clr r4
-		ld32 r4,r2			//Set memory locs to zero
-		ld32 r4,r3
+		st32 r2,r4			//Set memory locs to zero
+		st32 r3,r4
 		clr r8	//r8 is zero
 loop:		
 		ld08 r6,r2	//r6 stores current value
 		ld08 r7,r3	//r7 stores previous value
-		xor r4,r6,r7
-		cmp eq r4,r8  //check if there is a change
+		xor r10,r6,r7
+		cmp eq r10,r8  //check if there is a change
 		br true >loop //keep checking until change
 		nop
-		and r9,r4,r6
+		and r9,r10,r6
 		cmp neq r9,r8
 		br true >loop
 		nop
-		addi r4,1
+		clr r11		//If PC is at this instr., we have a direction change
+		ldr r11,0x10	//Check if it is left
+		cmp eq r7,r11
+		br true >l_shift 
+		nop
+		ldr r11,0x20
+		cmp eq r7,r11
+		br true >r_shift
+		nop
+		ldr r11,0x04
+		cmp eq r7,r11
+		br true >increment
+		nop
+		ldr r11,0x40
+		cmp eq r7,r11
+		br true >decrement
+		nop 
+l_shift:
+		lsh r4,r4,1
+		br always >write_and_clear
+		nop
+r_shift:	rsh r4,r4,1
+		br always >write_and_clear
+		nop
+increment:	addi r4,1
+		br always >write_and_clear
+		nop
+decrement:	addi r4,-1
+		br always >write_and_clear
+		nop	
+write_and_clear:
 		st08 r0,r4
+		st32 r2,r8
+		st32 r3,r8
 		br always >loop
 		nop	

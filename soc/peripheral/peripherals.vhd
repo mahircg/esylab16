@@ -60,6 +60,15 @@ package lt16soc_peripherals is
 				wslvo		: out wb_slv_out_type
 			);
 		end component;	
+		
+	component debounce is
+		generic(
+		 counter_size  :  INTEGER );
+		port(
+		 clk     : in  STD_LOGIC;  --input clock
+		 button  : in  STD_LOGIC;  --input signal to be debounced
+		 result  : out STD_LOGIC); --debounced signal
+	end component;
 
 end lt16soc_peripherals;
 

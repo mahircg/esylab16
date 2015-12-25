@@ -40,7 +40,7 @@ architecture RTL of lt16soc_top is
 
 	signal rst_gen	: std_logic;
 	
-	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_1000_0000_0000";
+	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_1100_0000_0000";
 	constant mst_mask_vector : std_logic_vector(0 to NWBMST-1) := b"1000";
 	
 	signal slvo	: wb_slv_out_vector := (others=> wbs_out_none);

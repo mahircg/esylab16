@@ -48,7 +48,12 @@ architecture Behavioral of audio is
 	signal pcm      : std_logic_vector(DATA_BW-1 downto 0);
 	signal idx, flg : unsigned(3 downto 0);
 	signal tone_sel : std_logic_vector(TONE_SEL_BW-1 downto 0);
-	signal new_tone : std_logic := '0';
+	signal counter	 : unsigned(7 downto 0);
+	signal new_tone : std_logic;
+	signal curr_tone : unsigned(7 downto 0);
+	type period_rom_type is array (TONE_SEL_BW/2 - 1 downto 0) of unsigned(7 downto 0);
+	constant period_rom : period_rom_type := (183,173,163,154,145,137,129,122,115,109,102,97,91,86,81,77);
+	
 
 	-- Add more signals if needed
 
@@ -86,9 +91,12 @@ begin
 	tone_selection : process(pcm_sync)
 	begin
 	if rising_edge(pcm_sync) then
-		
-		-- Your code here
-		
+		if curr_tone /= period_rom(idx) then
+			new_tone <= '1';
+			curr_tone <= period_rom(idx);
+		else
+			new_tone <= '0';
+		end if;
 	end if;
 	end process tone_selection;
 
@@ -97,10 +105,13 @@ begin
 	begin
 	if rst = '1' then
 		pcm  <= (others => '0');
+		counter <= (others => '0');
 	elsif rising_edge(pcm_sync) then
-		
-		-- Your code for the tone generation
-		
+			counter <= counter + 1;
+			if counter = curr_tone then
+				pcm <= not pcm;
+				counter <= (others => '0');
+			end if;	
 	end if;
 	end process tone_gen;
 

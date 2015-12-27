@@ -50,9 +50,10 @@ architecture Behavioral of audio is
 	signal tone_sel : std_logic_vector(TONE_SEL_BW-1 downto 0);
 	signal counter	 : unsigned(7 downto 0);
 	signal new_tone : std_logic;
-	signal curr_tone : unsigned(7 downto 0);
-	type period_rom_type is array (TONE_SEL_BW/2 - 1 downto 0) of unsigned(7 downto 0);
-	constant period_rom : period_rom_type := (183,173,163,154,145,137,129,122,115,109,102,97,91,86,81,77);
+	signal curr_tone : integer range 0 to 255;
+	type period_rom_type is array (0 to 15) of integer range 0 to 255;
+	--constant period_rom : period_rom_type := (183,173,163,154,145,137,129,122,115,109,102,97,91,86,81,77);
+	constant period_rom : period_rom_type := (91,86,81,77,72,68,64,61,57,54,51,48,45,43,40,38);
 	
 
 	-- Add more signals if needed
@@ -64,7 +65,7 @@ begin
 	if rising_edge(clk) then
 		if rst = '1' then
 			ack  <= '0';
-			data <= x"0F";
+			data <= x"00";
 		else
 			if wslvi.stb = '1' then
 				if wslvi.we = '1' then
@@ -78,7 +79,7 @@ begin
 	end if;
 	end process bus_interface;
 
-
+ 
 	wslvo.dat( 7 downto 0) <= data;
 	wslvo.dat(31 downto 8) <= (others => '0');
 	wslvo.ack              <= ack;
@@ -91,9 +92,9 @@ begin
 	tone_selection : process(pcm_sync)
 	begin
 	if rising_edge(pcm_sync) then
-		if curr_tone /= period_rom(idx) then
+		if curr_tone /= period_rom(to_integer(idx)) then
 			new_tone <= '1';
-			curr_tone <= period_rom(idx);
+			curr_tone <= period_rom(to_integer(idx));
 		else
 			new_tone <= '0';
 		end if;
@@ -108,7 +109,7 @@ begin
 		counter <= (others => '0');
 	elsif rising_edge(pcm_sync) then
 			counter <= counter + 1;
-			if counter = curr_tone then
+			if counter > curr_tone then
 				pcm <= not pcm;
 				counter <= (others => '0');
 			end if;	

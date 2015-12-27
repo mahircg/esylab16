@@ -3,10 +3,13 @@
   LIBRARY ieee;
   USE ieee.std_logic_1164.ALL;
   USE ieee.numeric_std.ALL;
+  USE work.lt16soc_peripherals.ALL;
+  USE work.config.ALL;
   USE work.wb_tp.ALL;
+  USE work.wishbone.ALL;
 
-  ENTITY testbench IS
-  END testbench;
+  ENTITY audio_tb IS
+  END audio_tb;
 
   ARCHITECTURE behavior OF audio_tb IS 
 
@@ -41,16 +44,18 @@
 			 signal rst: std_logic := '0';
 			 signal ac97_bitclk: std_logic := '0';
 			 signal ac97_sdi: std_logic := '0';
-			 signal wslvi: std_logic := '0';
+			 signal wslvi : wb_slv_in_type;
+			 signal wslvo : wb_slv_out_type;
 			 
 			 --Outputs
 			 signal ac97_sdo: std_logic := '0';
 			 signal ac97_sync: std_logic := '0';
 			 signal ac97_rst: std_logic := '0';
-			 signal wslvo: std_logic := '0';
+			 signal wmsto : wb_mst_out_type;
+			 
 			 
 			 --Misc
-			 signal slvi : wb_mst_out_type;
+			 signal datawritten: std_logic_vector(31 downto 0) := (others => '0');
 
 			 
           
@@ -81,32 +86,32 @@
 	
 	ac97_clk_process :process
    begin
-		clk <= '0';
+		ac97_bitclk <= '0';
 		wait for ac97_period/2;
-		clk <= '1';
+		ac97_bitclk <= '1';
 		wait for ac97_period/2;
    end process;
 	
-	wslvi.adr <= slvi.adr;
-	wslvi.dat <= slvi.dat;
-	wslvi.we <= slvi.we;
-	wslvi.sel <= slvi.sel;
-	wslvi.stb <= slvi.stb;
-	wslvi.cyc <= slvi.cyc;
-	wslvi.cti <= slvi.cti;
-	wslvi.bte <= slvi.bte;
+	wslvi.adr <= wmsto.adr;
+	wslvi.dat <= wmsto.dat;
+	wslvi.we <= wmsto.we;
+	wslvi.sel <= wmsto.sel;
+	wslvi.stb <= wmsto.stb;
+	wslvi.cyc <= wmsto.cyc;
+	wslvi.cti <= wmsto.cti;
+	wslvi.bte <= wmsto.bte;
 	
 	stim_proc: process
    begin		
       rst <= '1';
       wait for 20 ns;	
 		rst <= '0';
-		slvi.dat(3 downto 0) <= X"F";
-		generate_sync_wb_single_write(slvi,wslvo,clk,slave_out_data);
-		wait for 20 ns;
-		slvi.dat(3 downto 0) <= X"E";
-		generate_sync_wb_single_read(slvi,wslvo,clk,slave_out_data);
-		wait for 60 ns;
+		datawritten <= X"0000000F";
+		generate_sync_wb_single_write(wmsto,wslvo,clk,datawritten);
+		wait for 1000 ms;
+--		datawritten <= X"0000000E";
+--		generate_sync_wb_single_write(wmsto,wslvo,clk,datawritten);
+--		wait for 60 ns;
 		assert false report "Simulation ended" severity failure;
    end process;
 	

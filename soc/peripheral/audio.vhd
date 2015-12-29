@@ -87,11 +87,18 @@ begin
 
 	idx <= unsigned(data(3 downto 0));
 	flg <= unsigned(data(7 downto 4));
-
+	
 
 	tone_selection : process(pcm_sync)
 	begin
 	if rising_edge(pcm_sync) then
+	
+		if flg = X"F" then		--Use all flag bits for pcm_valid 
+			ce <= '1';
+		else
+			ce <= '0';
+		end if;
+		
 		if curr_tone /= period_rom(to_integer(idx)) then
 			new_tone <= '1';
 			curr_tone <= period_rom(to_integer(idx));

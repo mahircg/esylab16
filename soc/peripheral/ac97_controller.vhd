@@ -112,7 +112,8 @@ begin
 
 			when LISTEN =>
 				if sync_cnt = 255 then
-					--inst_valid <= '0';
+					state     <= LISTEN;
+					inst_addr <= x"00";
 				end if;
 
 		end case;

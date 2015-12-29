@@ -7,98 +7,109 @@ memfault:	reti
 sw_irq:		br always >sw_irq_handler
 			nop
 		
+		
+//Define device addresses
 .align
-sp_init:   			.word 0x410
-ptr_axialmeter: 	.word 0x400
-ptr_prev_state: 	.word 0x404
+sw_addr: 			.word 0x000F0004
+lcd_addr: 			.word 0x000F0008
+audio_addr: 		.word 0x000F000C
+
+
+.align
+sp_init:   			.word 0x530
+ptr_axialmeter: 	.word 0x520
+ptr_prev_state: 	.word 0x524
 string_base: 		.word 0x420
-index: 				.word 0x404	//current note index
+index: 				.word 0x400	//current note index
 ddr_start_addr: 	.word 0x80
 rs_mask: 			.word 0x200
 
 
 
+
+
 //Start storing strings from this base address
 //Align strings to 4-byte addresses to easily perform multiplication for base+(index*sizeof(string))
-.address 0x420		
-.word 0x4334204d
-.word 0x6964646c
-.word 0x65204320
+.address 0x420	
+	
+str0_0: .word 0x4334204D
+str0_1: .word 0x6964646C
+str0_2: .word 0x65204320
 
 .address 0x430
-.word 0x4323342f
-.word 0x44623420
-.word 0x20202020
+str1_0:.word 0x4323342F
+str1_1:.word 0x44623420
+str1_2:.word 0x20202020
 
 .address 0x440
-.word 0x44342020
-.word 0x20202020
-.word 0x20202020
+str2_0:.word 0x44342020
+str2_1:.word 0x20202020
+str2_2:.word 0x20202020
 
 .address 0x450
-.word 0x4423342f
-.word 0x45623420
-.word 0x20202020
+str3_0:.word 0x4423342F
+str3_1:.word 0x45623420
+str3_2:.word 0x20202020
 
 .address 0x460
-.word 0x45342020
-.word 0x20202020
-.word 0x20202020
+str4_0:.word 0x45342020
+str4_1:.word 0x20202020
+str4_2:.word 0x20202020
 
 .address 0x470
-.word 0x46342020
-.word 0x20202020
-.word 0x20202020
+str5_0:.word 0x46342020
+str5_1:.word 0x20202020
+str5_2:.word 0x20202020
 
 .address 0x480
-.word 0x4623342f
-.word 0x47623420
-.word 0x20202020
+str6_0:.word 0x4623342F
+str6_1:.word 0x47623420
+str6_2:.word 0x20202020
 
 .address 0x490
-.word 0x47342020
-.word 0x20202020
-.word 0x20202020
+str7_0:.word 0x47342020
+str7_1:.word 0x20202020
+str7_2:.word 0x20202020
 
 .address 0x4A0
-.word 0x4723342f
-.word 0x31623420
-.word 0x20202020
+str8_0:.word 0x4723342F
+str8_1:.word 0x31623420
+str8_2:.word 0x20202020
 
 .address 0x4B0
-.word 0x41342041
-.word 0x34343020
-.word 0x20202020
+str9_0:.word 0x41342041
+str9_1:.word 0x34343020
+str9_2:.word 0x20202020
 
 .address 0x4C0
-.word 0x3123342f
-.word 0x32623420
-.word 0x20202020
+str10_0:.word 0x3123342F
+str10_1:.word 0x32623420
+str10_2:.word 0x20202020
 
 .address 0x4D0
-.word 0x32342020
-.word 0x20202020
-.word 0x20202020
+str11_0:.word 0x32342020
+str11_1:.word 0x20202020
+str11_2:.word 0x20202020
 
 .address 0x4E0
-.word 0x43352054
-.word 0x656e6f72
-.word 0x20432020
+str12_0:.word 0x43352054
+str12_1:.word 0x656E6F72
+str12_2:.word 0x20432020
 
 .address 0x4F0
-.word 0x4323342f
-.word 0x44623420
-.word 0x20202020
+str13_0:.word 0x4323342F
+str13_1:.word 0x44623420
+str13_2:.word 0x20202020
 
 .address 0x500
-.word 0x44352020
-.word 0x20202020
-.word 0x20202020
+str14_0:.word 0x44352020
+str14_1:.word 0x20202020
+str14_2:.word 0x20202020
 
 .address 0x510
-.word 0x4423342f
-.word 0x45623420
-.word 0x20202020
+str15_0:.word 0x4423342F
+str15_1:.word 0x45623420
+str15_2:.word 0x20202020
 
 //uses r3 as axialmeter and r4 as prevaxialmeter
 sw_irq_handler:		
@@ -108,10 +119,6 @@ sw_irq_handler:
 		st08 r4,r5		//Store axialmeter value in mem
 		reti
 		nop
-
-sw_addr: 		.word 0x000F0004
-lcd_addr: 		.word 0x00F0008
-audio_addr: 	.word 0x000F000C
 
 
 main:
@@ -172,7 +179,7 @@ up:		ldr r10,>index
 		
 down:	ldr r10,>index
 		ld32 r5,r10
-		subi r5,1
+		addi r5,-1
 		lsh r5,r5,2					//Multiply index by 4
 		ldr r10,>string_base		//r10 holds base address
 		add r10,r10,r5				//String address is base + index*4

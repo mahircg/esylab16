@@ -1,0 +1,208 @@
+reset: 		br always >main
+			nop
+hardfault:	reti
+			nop
+memfault:	reti
+			nop
+sw_irq:		br always >sw_irq_handler
+			nop
+		
+.align
+sp_init:   			.word 0x410
+ptr_axialmeter: 	.word 0x400
+ptr_prev_state: 	.word 0x404
+string_base: 		.word 0x420
+index: 				.word 0x404	//current note index
+ddr_start_addr: 	.word 0x80
+rs_mask: 			.word 0x200
+
+
+
+//Start storing strings from this base address
+//Align strings to 4-byte addresses to easily perform multiplication for base+(index*sizeof(string))
+.address 0x420		
+.word 0x4334204d
+.word 0x6964646c
+.word 0x65204320
+
+.address 0x430
+.word 0x4323342f
+.word 0x44623420
+.word 0x20202020
+
+.address 0x440
+.word 0x44342020
+.word 0x20202020
+.word 0x20202020
+
+.address 0x450
+.word 0x4423342f
+.word 0x45623420
+.word 0x20202020
+
+.address 0x460
+.word 0x45342020
+.word 0x20202020
+.word 0x20202020
+
+.address 0x470
+.word 0x46342020
+.word 0x20202020
+.word 0x20202020
+
+.address 0x480
+.word 0x4623342f
+.word 0x47623420
+.word 0x20202020
+
+.address 0x490
+.word 0x47342020
+.word 0x20202020
+.word 0x20202020
+
+.address 0x4A0
+.word 0x4723342f
+.word 0x31623420
+.word 0x20202020
+
+.address 0x4B0
+.word 0x41342041
+.word 0x34343020
+.word 0x20202020
+
+.address 0x4C0
+.word 0x3123342f
+.word 0x32623420
+.word 0x20202020
+
+.address 0x4D0
+.word 0x32342020
+.word 0x20202020
+.word 0x20202020
+
+.address 0x4E0
+.word 0x43352054
+.word 0x656e6f72
+.word 0x20432020
+
+.address 0x4F0
+.word 0x4323342f
+.word 0x44623420
+.word 0x20202020
+
+.address 0x500
+.word 0x44352020
+.word 0x20202020
+.word 0x20202020
+
+.address 0x510
+.word 0x4423342f
+.word 0x45623420
+.word 0x20202020
+
+//uses r3 as axialmeter and r4 as prevaxialmeter
+sw_irq_handler:		
+		ld08 r5,r3		//Copy axialmeter into prevaxialstate
+		st08 r4,r5
+		ld16 r5,r0		//Read axialmeter
+		st08 r4,r5		//Store axialmeter value in mem
+		reti
+		nop
+
+sw_addr: 		.word 0x000F0004
+lcd_addr: 		.word 0x00F0008
+audio_addr: 	.word 0x000F000C
+
+
+main:
+		ldr sp, >sp_init
+        clr sr
+		ldr r0,>sw_addr
+		ldr r1,>lcd_addr
+		ldr r2,>audio_addr
+		ldr r3,>ptr_axialmeter		//Assign pointer addresses
+		ldr r4,>ptr_prev_state
+		clr r8
+		st32 r2,r8					//Set memory locs to zero
+		st32 r3,r8
+		ldr r5,>index
+		st32 r5,r8					//Set current index to zero
+		
+poll1:	ld32 r5,r1					//Wait until LCD is initialized
+        rsh r5,r5,11
+        cmp neq r5,r8
+        br true >poll1
+        nop
+		ldr r6,>ddr_start_addr
+		st32 r1,r6
+		
+		
+		
+loop:		
+		ld08 r6,r2					//r6 stores current value
+		ld08 r7,r3					//r7 stores previous value
+		xor r10,r6,r7
+		cmp eq r10,r8  				//check if there is a change
+		br true >loop 				//keep checking until change
+		nop
+		and r9,r10,r6
+		cmp neq r9,r8
+		br true >loop
+		nop
+		clr r11						//If PC is at this instr., we have a direction change	
+		addi r11,0x08  				//Check if it is up
+		cmp eq r7,r11
+		br true >up
+		nop
+		clr r11
+		addi r11,0x40
+		cmp eq r7,r11
+		br true >down
+		nop 
+		br always >loop
+		nop
+//XXX: take care overflow and underflows!!
+up:		ldr r10,>index
+		ld32 r5,r10
+		addi r5,1
+		lsh r5,r5,2					//Multiply index by 4
+		ldr r10,>string_base		//r10 holds base address
+		add r10,r10,r5				//String address is base + index*4
+		br always >clear_and_write
+		
+down:	ldr r10,>index
+		ld32 r5,r10
+		subi r5,1
+		lsh r5,r5,2					//Multiply index by 4
+		ldr r10,>string_base		//r10 holds base address
+		add r10,r10,r5				//String address is base + index*4
+		br always >clear_and_write
+		
+clear_and_write:
+	ldr r11,>ddr_start_addr		//Reset LCD DDRAM address
+	st32 r1,r11
+	clr r11
+	addi r11,12
+	clr r9
+
+inc_addr:
+poll2:
+	ld32 r5,r1
+	rsh r5,r5,11
+	cmp neq r5,r8
+	br true >poll2					//Wait until device is available
+	nop
+	
+	ld08 r5,r10
+	or r5,r5,rs_mask
+	st32 r1,r5
+	cmp neq r9,r11
+	br true >inc_addr          		//if i=cnt_top
+    addi r9,1
+	br always >loop
+	nop
+	
+	
+		
+		
+		

@@ -118,6 +118,19 @@ package lt16soc_peripherals is
 			ac97_rst    : out std_ulogic
 		);
  	end component;
+	
+	component string_rom is
+        generic(
+                memaddr         :       generic_addr_type; 
+                addrmask        :       generic_mask_type 
+        );
+        port(
+                clk             : in  std_logic;
+                rst             : in  std_logic;
+                wslvi   		  : in      wb_slv_in_type;
+                wslvo           : out     wb_slv_out_type
+        );
+	end component;
 -- END AUDIO Components -----------------------------------------------
 
 end lt16soc_peripherals;

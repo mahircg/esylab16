@@ -40,7 +40,7 @@ architecture RTL of lt16soc_top is
 
 	signal rst_gen	: std_logic;
 	
-	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_1100_0000_0000";
+	constant slv_mask_vector : std_logic_vector(0 to NWBSLV-1) := b"1111_1110_0000_0000";
 	constant mst_mask_vector : std_logic_vector(0 to NWBMST-1) := b"1000";
 	
 	signal slvo	: wb_slv_out_vector := (others=> wbs_out_none);
@@ -195,7 +195,7 @@ begin
 		CFG_BADR_SWITCH,CFG_MADR_SWITCH
 	)
 	port map(
-	clk,rst_gen,btn_debounced,sw,slvi(CFG_SWITCH),irq_lines(3),slvo(CFG_SWITCH)
+	clk,rst_gen,btn,sw,slvi(CFG_SWITCH),irq_lines(3),slvo(CFG_SWITCH)
 	);
 	
 	lcddev : wb_lcd_adv
@@ -205,6 +205,13 @@ begin
 	port map(
 	clk,rst_gen,dataLCD,enableLCD,rsLCD,rwLCD,slvi(CFG_LCD),slvo(CFG_LCD)
 	);
+	
+	str_rom : string_rom
+	generic map(
+		memaddr => CFG_BADR_STR_ROM,
+		addrmask => CFG_MADR_STR_ROM )
+	port map(
+		clk,rst_gen,slvi(CFG_STR_ROM),slvo(CFG_STR_ROM) );
 	
 	GEN_DEBOUNCER:
 	for i in 0 to 6 generate

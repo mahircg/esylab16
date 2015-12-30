@@ -41,6 +41,8 @@ begin
 		if rising_edge(clk) then
 			if rst = '1' then
 				change <= '0';
+				sw_reg <= (others => '0');
+				bt_reg <= (others => '0');
 			else
 				if sw_reg /= sw or bt_reg /= btn then
 					change <= '1';

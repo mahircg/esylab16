@@ -52,7 +52,7 @@ begin
 	end process;
 
 	wslvo.dat(7 downto 0)	<= data;
-	wslvo.dat(31 downto 8)	<= (others=>'0');
+	wslvo.dat(31 downto 8)	<= (others=>'1');
 
 	led <= data;
 

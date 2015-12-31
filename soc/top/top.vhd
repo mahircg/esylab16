@@ -14,7 +14,7 @@ use work.lt16soc_peripherals.all;
 
 entity lt16soc_top is
 generic(
-	programfilename : string := "programs/assignment4_code.ram" -- see "Synthesize XST" process properties for actual value ("-generics" in .xst file)!
+	programfilename : string := "C:\Users\Mahircan\Ders\embedded_systems_lab\lt16lab\programs\project.ram" -- see "Synthesize XST" process properties for actual value ("-generics" in .xst file)!
 );
 port(
 	-- clock signal
@@ -195,7 +195,7 @@ begin
 		CFG_BADR_SWITCH,CFG_MADR_SWITCH
 	)
 	port map(
-	clk,rst_gen,btn,sw,slvi(CFG_SWITCH),irq_lines(3),slvo(CFG_SWITCH)
+	clk,rst_gen,btn_debounced,sw,slvi(CFG_SWITCH),irq_lines(3),slvo(CFG_SWITCH)
 	);
 	
 	lcddev : wb_lcd_adv

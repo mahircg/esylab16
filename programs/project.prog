@@ -55,6 +55,10 @@ poll1:	ld32 r5,r1					//Wait until LCD is initialized
 		ldr r6,>ddr_start_addr
 		st32 r1,r6
 		
+		ldr r10,>string_base		//Print first notes name on screen
+		br always >clear_and_write
+		nop
+		
 		
 		
 loop:	clr r8
@@ -82,11 +86,14 @@ loop:	clr r8
 		br always >loop
 		nop
 //XXX: take care overflow and underflows!!
-up:		ldr r10,>index		//154
+up:		ldr r10,>index		
 		ld32 r5,r10
-		addi r5,1		//XXX: first use then increment
+		addi r5,1
+		clr r9
+		addi r9,0x0F
+		and r5,r5,r9				//Wrap to zero after 15
 		st32 r10,r5
-		lsh r5,r5,2					//Multiply index by 4
+		lsh r5,r5,4					//Multiply index by 16
 		ldr r10,>string_base		//r10 holds base address
 		add r10,r10,r5				//String address is base + index*4
 		br always >clear_and_write
@@ -94,39 +101,53 @@ up:		ldr r10,>index		//154
 		
 down:	ldr r10,>index
 		ld32 r5,r10
+		cmp eq r5,r8
+		br true >cont
+		nop
 		addi r5,-1
 		st32 r10,r5
-		lsh r5,r5,2					//Multiply index by 4
-		ldr r10,>string_base		//r10 holds base address
-		add r10,r10,r5				//String address is base + index*4
+		lsh r5,r5,4					
+cont:	ldr r10,>string_base		
+		add r10,r10,r5				
 		br always >clear_and_write
 		nop
 		
-//XXX: Poll here
-clear_and_write:
-	ldr r11,>ddr_start_addr		//Reset LCD DDRAM address
-	st32 r1,r11
-	clr r11
-	addi r11,12
-	clr r9
 
-inc_addr:
-poll2:
-	clr r8		//198
+clear_and_write:
+poll2:	
+	clr r8		
 	ld32 r5,r1
 	rsh r5,r5,11
 	cmp neq r5,r8
-	br true >poll2					//Wait until device is available
-	nop
+	br true >poll2					
+	nop		
 	
-	ldr r8,>rs_mask	//212
+	ldr r11,>ddr_start_addr		//Reset LCD DDRAM address
+	st32 r1,r11
+	clr r11
+	addi r11,11
+	clr r9
+	st32 r3,r9
+	st32 r4,r9
+
+inc_addr:
+poll3:
+	clr r8		//222
+	ld32 r5,r1
+	rsh r5,r5,11
+	cmp neq r5,r8
+	br true >poll3					
+	nop		//232
+	
+	ldr r8,>rs_mask	
 	ld08 r5,r10
 	addi r10,1
 	or r5,r5,r8
 	st32 r1,r5
 	cmp neq r9,r11
-	br true >inc_addr          		//if i=cnt_top
-    addi r9,1
+	addi r9,1
+	br true >inc_addr          		
+    nop
 	br always >loop
 	nop
 	

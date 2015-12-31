@@ -84,7 +84,7 @@ begin
 		else
 			case lcd_state is
 			when ifs =>
-				if count /= NUM_CYCLES_37US then
+				if count /= NUM_CYCLES_40MS then
 					rwLCD <= '0';
 					rsLCD <= '0';
 					count <= count + 1;

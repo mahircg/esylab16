@@ -70,14 +70,15 @@ BEGIN
 		btn <="0000000";
 		wait for 2*CLK_PERIOD;
 		rst <= '1';
-		wait for 2 ms;
-		btn <="0000000";
-		wait for 1 us;
-		btn <="0001000";
-		wait for 1 us;
-		btn <="0000000";
-		wait for 1 us;
-		wait ;
+		wait for 22 ms;
+		for I in 0 to 14 loop
+			btn <="0000000";
+			wait for 1 us;
+			btn <="0001000";
+			wait for 1 us;
+			btn <="0000000";
+			wait for 20 ms;
+		end loop;
 		assert false report "Simulation terminated!" severity failure;
 	end process stimuli;
 

@@ -36,7 +36,7 @@ end entity ac97_controller;
 
 architecture Behavioral of ac97_controller is
 
-	type state_type is (RESET, SET_VOL_HP, SET_VOL_PCM, LISTEN);
+	type state_type is (RESET,SET_MASTER, SET_VOL_HP, SET_VOL_PCM, LISTEN);
 	signal state      : state_type;
 	signal data_sync  : std_logic;
 	signal inst_addr  : inst_addr_type;
@@ -45,7 +45,7 @@ architecture Behavioral of ac97_controller is
 	signal reset_int  : std_logic;
 	signal rst_cnt    : unsigned(7 downto 0);
 	signal sync_cnt   : unsigned(7 downto 0);
-
+	 --attribute buffer_type of output: output is "bufr";
 begin
 
 	-- 48KHz synchronization signal for the PCM data
@@ -89,15 +89,23 @@ begin
 		case state is
 			when RESET =>
 				sync_cnt   <= (others => '0');
-				inst_addr  <= x"04"; -- SET VOLUME(ATTENUATION) FOR HP-OUT
+				inst_addr  <= x"00"; -- SET VOLUME(ATTENUATION) FOR HP-OUT
 				inst_data  <= x"0000";
-				inst_valid <= '1';
-				state      <= SET_VOL_HP;
+				inst_valid <= '0';
+				state      <= SET_MASTER;
+				
+			when SET_MASTER =>
+				if sync_cnt = 255 then
+					state     <= SET_VOL_HP;
+					inst_addr <= x"02"; -- PCM OUT
+					inst_data <= x"0000";
+					inst_valid <= '1';
+				end if;
 
 			when SET_VOL_HP =>
 				if sync_cnt = 255 then
 					state     <= SET_VOL_PCM;
-					inst_addr <= x"18"; -- PCM OUT
+					inst_addr <= x"04"; -- PCM OUT
 					inst_data <= x"0000";
 					inst_valid <= '1';
 				end if;
@@ -105,7 +113,7 @@ begin
 			when SET_VOL_PCM =>
 				if sync_cnt = 255 then
 					state     <= LISTEN;
-					inst_addr <= x"02"; -- Master volume 
+					inst_addr <= x"18"; -- Master volume 
 					inst_data <= x"0000";
 					inst_valid <= '1';
 				end if;
@@ -113,7 +121,7 @@ begin
 			when LISTEN =>
 				if sync_cnt = 255 then
 					state     <= LISTEN;
-					inst_addr <= x"00";
+					inst_valid <= '0';
 				end if;
 
 		end case;

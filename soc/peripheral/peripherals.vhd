@@ -74,6 +74,28 @@ package lt16soc_peripherals is
 	subtype inst_addr_type is std_logic_vector(7 downto 0);
 	subtype inst_data_type is std_logic_vector(15 downto 0);
 	subtype slot_type is std_logic_vector(19 downto 0);
+	
+	component audio is
+		generic(
+			MEMADDR     : generic_addr_type; 
+			ADDRMASK    : generic_mask_type; 
+			DATA_BW     : natural := 16;
+			TONE_SEL_BW : natural := 8
+		);  
+		port(
+			clk         : in  std_logic;
+			rst         : in  std_logic;
+
+			ac97_bitclk : in  std_logic;
+			ac97_sdi    : in  std_logic;
+			ac97_sdo    : out std_logic;
+			ac97_sync   : out std_logic;
+			ac97_rst    : out std_logic;
+
+			wslvi       : in  wb_slv_in_type;
+			wslvo       : out wb_slv_out_type
+	);
+end component;
 
 	component ac_link is
 		generic(

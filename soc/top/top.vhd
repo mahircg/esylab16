@@ -14,7 +14,7 @@ use work.lt16soc_peripherals.all;
 
 entity lt16soc_top is
 generic(
-	programfilename : string := "C:\Users\Mahircan\Ders\embedded_systems_lab\lt16lab\programs\project.ram" -- see "Synthesize XST" process properties for actual value ("-generics" in .xst file)!
+	programfilename : string := "C:\Users\Mahircan\Ders\embedded_systems_lab\lt16lab\programs\idle.ram" -- see "Synthesize XST" process properties for actual value ("-generics" in .xst file)!
 );
 port(
 	-- clock signal
@@ -28,7 +28,12 @@ port(
 	rsLCD		: out std_logic;
 	rwLCD		: out std_logic;
 	dataLCD	: inout std_logic_vector(7 downto 0);
-	sw       : in  std_logic_vector(7 downto 0)
+	sw       : in  std_logic_vector(7 downto 0);
+	ac97_bitclk : in  std_logic;
+	ac97_sdi    : in  std_logic;
+	ac97_sdo    : out std_logic;
+	ac97_sync   : out std_logic;
+	ac97_rst    : out std_logic
 );
 end entity lt16soc_top;
 
@@ -212,6 +217,13 @@ begin
 		addrmask => CFG_MADR_STR_ROM )
 	port map(
 		clk,rst_gen,slvi(CFG_STR_ROM),slvo(CFG_STR_ROM) );
+		
+	audiodev: audio
+	generic map(
+		memaddr => CFG_BADR_AUDIO,
+		addrmask => CFG_MADR_AUDIO )
+	port map(
+	clk,rst_gen,ac97_bitclk,ac97_sdi,ac97_sdo,ac97_sync,ac97_rst,slvi(CFG_AUDIO),slvo(CFG_AUDIO) );
 	
 	GEN_DEBOUNCER:
 	for i in 0 to 6 generate

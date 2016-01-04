@@ -1,6 +1,7 @@
 
 NET	clk   LOC="AG18";
 NET	clk TNM_NET = clk;
+NET clk IOSTANDARD = LVCMOS33;
 TIMESPEC TS_clk = PERIOD "clk" 10 ns HIGH 50%;
 
 #reset button (active low)
@@ -51,12 +52,12 @@ NET "btn<5>"			LOC = "J17"; # Joystick "right"
 NET "btn<6>"			LOC = "H15"; # Joystick "down"
 
 # Audio
-#NET "ac97_bitclk" TNM="bitclk" | IOSTANDARD=LVCMOS33 | LOC = "AH17";   # Bank = 4,   Pin name = IO_L7P_GC_VRN_4,   Sch name = AUD-BIT-CLK
-#NET "ac97_sdi"  LOC = "AE18" | IOSTANDARD=LVCMOS33;   # Bank = 4,   Pin name = IO_L8N_CC_GC_4,    Sch name = AUD-SDI
-#NET "ac97_sdo"  LOC = "AG20" | IOSTANDARD=LVCMOS33;    # Bank = 4,   Pin name = IO_L4N_GC_VREF_4,  Sch name = AUD-SDO
-#NET "ac97_sync" LOC = "J9" | IOSTANDARD=LVCMOS33;     # Bank = 20,  Pin name = IO_L9N_CC_20,      Sch name = AUD-SYNC
-#NET "ac97_rst"  LOC = "E12" | IOSTANDARD=LVCMOS33;    # Bank = 20,  Pin name = IO_L17P_20,        Sch name = AUD-RESET
-#TIMESPEC "TS_AC97_BITCLK"=PERIOD "bitclk" 81.4 ns HIGH 50%;
+NET "ac97_bitclk" TNM="bitclk" | IOSTANDARD=LVCMOS33 | LOC = "AH17";   # Bank = 4,   Pin name = IO_L7P_GC_VRN_4,   Sch name = AUD-BIT-CLK
+NET "ac97_sdi"  LOC = "AE18" | IOSTANDARD=LVCMOS33;   # Bank = 4,   Pin name = IO_L8N_CC_GC_4,    Sch name = AUD-SDI
+NET "ac97_sdo"  LOC = "AG20" | IOSTANDARD=LVCMOS33;    # Bank = 4,   Pin name = IO_L4N_GC_VREF_4,  Sch name = AUD-SDO
+NET "ac97_sync" LOC = "J9" | IOSTANDARD=LVCMOS33;     # Bank = 20,  Pin name = IO_L9N_CC_20,      Sch name = AUD-SYNC
+NET "ac97_rst"  LOC = "E12" | IOSTANDARD=LVCMOS33;    # Bank = 20,  Pin name = IO_L17P_20,        Sch name = AUD-RESET
+TIMESPEC "TS_AC97_BITCLK"=PERIOD "bitclk" 81.4 ns HIGH 50%;
 
 ##############################################################################################
 # Anything below is unlikely to be used

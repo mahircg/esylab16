@@ -37,7 +37,7 @@
           
 			 --Constants
 			 constant clk_period : time := 10 ns;
-			 constant ac97_period : time := 81.38 ns;
+			 constant ac97_period : time := 81.40 ns;
 			 
 			 --Inputs
 			 signal clk: std_logic := '0';
@@ -106,9 +106,15 @@
       rst <= '1';
       wait for 20 ns;	
 		rst <= '0';
-		datawritten <= X"0000000F";
+		datawritten <= X"000000FF";
 		generate_sync_wb_single_write(wmsto,wslvo,clk,datawritten);
-		wait for 1000 ms;
+		wait for 1 ms;
+		datawritten <= X"000000FE";
+		generate_sync_wb_single_write(wmsto,wslvo,clk,datawritten);
+		wait for 1 ms;
+		datawritten <= X"000000F0";
+		generate_sync_wb_single_write(wmsto,wslvo,clk,datawritten);
+		wait for 1 ms;
 --		datawritten <= X"0000000E";
 --		generate_sync_wb_single_write(wmsto,wslvo,clk,datawritten);
 --		wait for 60 ns;

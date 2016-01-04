@@ -14,6 +14,7 @@ sw_addr: 			.word 0x000F0004
 lcd_addr: 			.word 0x000F0008
 audio_addr: 		.word 0x000F000C
 string_base: 		.word 0x000E0000
+//led_addr:			.word 0x000F0000
 
 .align
 sp_init:   			.word 0x410
@@ -68,8 +69,13 @@ loop:	clr r8
 		xor r10,r6,r7
 		cmp eq r10,r8  				//check if there is a change
 		br true >loop 				//keep checking until change
+		nop		//120
+		clr r11
+		addi r11,0x04
+		cmp eq r6,r11				//Check current value to see if button is being pressed
+		br true >press_start
 		nop
-		and r9,r10,r6		//122
+		and r9,r10,r6		
 		cmp neq r9,r8
 		br true >loop
 		nop
@@ -79,13 +85,18 @@ loop:	clr r8
 		br true >up
 		nop
 		clr r11
+		addi r11,0x04
+		cmp eq r7,r11
+		br true >press_finish		//Button is released
+		nop
+		clr r11
 		addi r11,0x40
 		cmp eq r7,r11
 		br true >down
 		nop 
 		br always >loop
 		nop
-//XXX: take care overflow and underflows!!
+
 up:		ldr r10,>index		
 		ld32 r5,r10
 		addi r5,1
@@ -112,6 +123,27 @@ cont:	ldr r10,>string_base
 		br always >clear_and_write
 		nop
 		
+press_start:
+//		clr r11
+//		addi r11,15
+//		st08 r2,r11
+		ldr r10, >index	//222
+		clr r11
+		addi r11,0x0F
+		lsh r11,r11,4
+		ld32 r5,r10
+		or r5,r5,r11	//Enable pcm_valid
+		st08 r2,r5
+		br always >loop
+		nop
+		
+press_finish:
+//		clr r11
+//		st08 r2,r11
+		clr r11
+		st08 r2,r11
+		br always >loop
+		nop
 
 clear_and_write:
 poll2:	

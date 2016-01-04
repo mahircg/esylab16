@@ -44,7 +44,6 @@ architecture Behavioral of audio is
 	signal ack      : std_logic := '0';
 	signal pcm_sync : std_logic := '0';
 	signal ce       : std_logic := '0';
-	signal rst_ac97 : std_logic := '0';
 	signal pcm      : std_logic_vector(DATA_BW-1 downto 0);
 	signal idx, flg : unsigned(3 downto 0);
 	signal tone_sel : std_logic_vector(TONE_SEL_BW-1 downto 0);
@@ -141,10 +140,10 @@ begin
 			ac97_sdi    => ac97_sdi,
 			ac97_sdo    => ac97_sdo,
 			ac97_sync   => ac97_sync,
-			ac97_rst    => rst_ac97
+			ac97_rst    => ac97_rst
 		);
 		
-		ac97_rst <= rst_ac97;
+		
 
 end Behavioral;
 

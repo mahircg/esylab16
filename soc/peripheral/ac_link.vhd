@@ -10,8 +10,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.lt16soc_peripherals.all;
+
 
 entity ac_link is
 	generic(
@@ -36,32 +36,44 @@ entity ac_link is
 	);
 end entity ac_link;
 
+
 architecture Behavioral of ac_link is
 
-	type slots_t is array (0 to 11) of slot_type;
-	signal slots    : slots_t := (others => (others => '0'));
-	signal tag      : tag_type := (others => '0');
 	signal counter  : unsigned(7 downto 0);
-	signal sync : std_logic ;
 	
-
+	signal latch_tag      : tag_type := (others => '0');
+	signal latch_left_data	: std_logic_vector(19 downto 0);
+	signal latch_right_data : std_logic_vector(19 downto 0);
+	signal latch_cmd_addr   : std_logic_vector(19 downto 0);		
+	signal latch_cmd_data   : std_logic_vector(19  downto 0);
+	
 	-- Add more signals if needed
 
 begin
 
 
 
-sync_proc : process(ac97_bitclk)
+sync_proc : process(counter,ac97_bitclk,rst)
 begin
-	if rising_edge(ac97_bitclk) then
-		if rst = '1'  then
-			ac97_rst <= '0';
-			ac97_sync <= '0';
+	if rst = '1'  then
 			counter <= "11111110";	--initialize to 254
-		else
-			ac97_rst <= '1';
-			if counter = 255 then 
+			
+	elsif rising_edge(ac97_bitclk) then
+			if counter = 255 then 			--For asserting ac97_sync after reset
 				ac97_sync <= '1';
+			end if;
+			
+			if counter = 254 then		--Latch data on rising edge of ac97_sync
+				latch_cmd_addr   <= inst_addr & "000000000000";
+				latch_cmd_data   <= inst_data & "0000";
+				latch_left_data  <= X"0" & pcm_i_left ;
+				latch_right_data <= X"0" & pcm_i_right  ;
+				latch_tag(latch_tag'left)<= pcm_valid or inst_valid;
+				latch_tag(latch_tag'left-1) <= inst_valid;
+				latch_tag(latch_tag'left-2) <= inst_valid;
+				latch_tag(latch_tag'left-3) <= pcm_valid ;
+				latch_tag(latch_tag'left-4) <= pcm_valid ;
+				latch_tag(latch_tag'left-5 downto latch_tag'right) <= (others => '0');
 			end if;
 			
 			if counter > 13 and counter <= 253 then
@@ -70,8 +82,8 @@ begin
 				ac97_sync <= '1';
 			end if;
 			counter <= counter + 1;
-		end if;
 	end if;
+	
 end process;
 
 
@@ -80,21 +92,20 @@ begin
 
 	if rising_edge(ac97_bitclk) then
 		if rst = '1' then
-			ac97_sdo <= '0';
+			null;
 		else
-		--start writing data on slots to codec through ac97_sdo
 				if counter = 255 then
-					ac97_sdo <= tag(tag'left);
+					ac97_sdo <= latch_tag(latch_tag'left);
 				elsif counter < 15 then
-					ac97_sdo <= tag(14-to_integer(counter));
+					ac97_sdo <= latch_tag(14-to_integer(counter));
 				elsif counter < 35 then
-					ac97_sdo <= slots(0)(34-to_integer(counter));
+					ac97_sdo <= latch_cmd_addr(34-to_integer(counter));
 				elsif counter < 55 then
-					ac97_sdo <= slots(1)(54-to_integer(counter));
+					ac97_sdo <= latch_cmd_data(54-to_integer(counter));
 				elsif counter < 75 then
-					ac97_sdo <= slots(2)(74-to_integer(counter));
+					ac97_sdo <= latch_left_data(74-to_integer(counter));
 				elsif counter < 95 then
-					ac97_sdo <= slots(3)(94-to_integer(counter));
+					ac97_sdo <= latch_right_data(94-to_integer(counter));
 				else
 					ac97_sdo <= '0';
 				end if;
@@ -103,24 +114,8 @@ begin
 	end if;
 end process;
 
-tag(tag'left)<= pcm_valid or inst_valid;
-tag(tag'left-1) <= inst_valid;
-tag(tag'left-2) <= inst_valid;
-tag(tag'left-3) <= pcm_valid ;
-tag(tag'left-4) <= pcm_valid ;
-tag(tag'left-5 downto tag'right) <= (others => '0');
 
---Fill slot 0(addr)
-slots(0) <=  inst_addr & X"000";
---Fill slot 1(cmd)
-slots(1) <= inst_data & X"0";
---Fill slot 2(pcm_left)
-slots(2) <= pcm_i_left & X"0";
---Fill slot 3(pcm_right)
-slots(3) <= pcm_i_right & X"0";
 
---Fill rest of slots with zero
-slots(4 to 11) <= (others => (others => '0'));
 
 
 end Behavioral;

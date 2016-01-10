@@ -1,7 +1,7 @@
 ------------------------------------------------------
 -- Embedded System Lab (preparation)
--- Filename: ac97_controller.vhd
--- Functionality: Transfers commands and sends PCM data to/from AC'97 Codec via AC-Link
+-- Filename: ac_link.vhd
+-- Functionality: Sends data to AC'97 Codec via AC-Link
 -- Author: Jhon Jimenez
 -- Created: 27.10.15
 -- Last modified: 27.10.15
@@ -10,8 +10,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 use work.lt16soc_peripherals.all;
+
 
 entity ac97_controller is
 	generic(
@@ -34,18 +34,23 @@ entity ac97_controller is
 	);
 end entity ac97_controller;
 
+
 architecture Behavioral of ac97_controller is
 
-	type state_type is (RESET,SET_MASTER, SET_VOL_HP, SET_VOL_PCM, LISTEN);
+	
+
+	type state_type is (RESET,SET_3D,SET_PHONE,SET_MASTER, SET_VOL_HP, SET_VOL_PCM, LISTEN);
 	signal state      : state_type;
 	signal data_sync  : std_logic;
 	signal inst_addr  : inst_addr_type;
 	signal inst_data  : inst_data_type;
 	signal inst_valid : std_logic;
-	signal reset_int  : std_logic;
-	signal rst_cnt    : unsigned(7 downto 0);
+	signal reset_int  : std_logic := '1';
+	signal rst_cnt    : unsigned(15 downto 0);
 	signal sync_cnt   : unsigned(7 downto 0);
-	 --attribute buffer_type of output: output is "bufr";
+	
+	
+
 begin
 
 	-- 48KHz synchronization signal for the PCM data
@@ -55,14 +60,16 @@ begin
 	begin
 	if rising_edge(clk) then
 		if rst = '1' then
+			ac97_rst <= '0';
 			reset_int <= '1';
 			rst_cnt   <= (others => '0');
-		end if;
 		
-		if reset_int = '1' then
+		
+		elsif reset_int = '1' then
 			rst_cnt <= rst_cnt + 1;
-			if rst_cnt = x"63" then -- 1us delay
+			if rst_cnt = x"0ECD" then 
 				reset_int <= '0';
+				ac97_rst <= '1';
 			end if;
 		end if;
 	end if;
@@ -89,15 +96,16 @@ begin
 		case state is
 			when RESET =>
 				sync_cnt   <= (others => '0');
-				inst_addr  <= x"00"; -- SET VOLUME(ATTENUATION) FOR HP-OUT
+				inst_addr  <= x"00"; -- DO NOT SET ANYTHING
 				inst_data  <= x"0000";
 				inst_valid <= '0';
 				state      <= SET_MASTER;
 				
+				
 			when SET_MASTER =>
 				if sync_cnt = 255 then
 					state     <= SET_VOL_HP;
-					inst_addr <= x"02"; -- PCM OUT
+					inst_addr <= x"02"; -- MASTER OUT
 					inst_data <= x"0000";
 					inst_valid <= '1';
 				end if;
@@ -105,16 +113,33 @@ begin
 			when SET_VOL_HP =>
 				if sync_cnt = 255 then
 					state     <= SET_VOL_PCM;
-					inst_addr <= x"04"; -- PCM OUT
+					inst_addr <= x"04"; -- HP OUT
 					inst_data <= x"0000";
 					inst_valid <= '1';
 				end if;
 
 			when SET_VOL_PCM =>
 				if sync_cnt = 255 then
-					state     <= LISTEN;
-					inst_addr <= x"18"; -- Master volume 
+					state     <= SET_PHONE;
+					inst_addr <= x"18"; -- PCM OUT 
 					inst_data <= x"0000";
+					inst_valid <= '1';
+				end if;
+			
+			when SET_PHONE =>
+				if sync_cnt = 255 then
+					state     <= SET_3D;
+					inst_addr <= x"0C"; -- PCM OUT 
+					inst_data <= x"0008";
+					inst_valid <= '1';
+				end if;
+				
+				
+			when SET_3D =>
+				if sync_cnt = 255 then
+					state     <= LISTEN;
+					inst_addr <= x"20"; -- 3D
+					inst_data <= x"8000";
 					inst_valid <= '1';
 				end if;
 
@@ -148,9 +173,7 @@ begin
 			ac97_sdi    => ac97_sdi,
 			ac97_sdo    => ac97_sdo,
 			ac97_sync   => ac97_sync,
-			ac97_rst    => ac97_rst
+			ac97_rst    => open
 		);
 
-
 end Behavioral;
-

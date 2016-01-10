@@ -48,14 +48,13 @@ architecture Behavioral of audio is
 	signal idx, flg : unsigned(3 downto 0);
 	signal tone_sel : std_logic_vector(TONE_SEL_BW-1 downto 0);
 	signal counter	 : unsigned(7 downto 0);
-	signal new_tone : std_logic;
 	signal curr_tone : integer range 0 to 255;
 	type period_rom_type is array (0 to 15) of integer range 0 to 255;
 	--constant period_rom : period_rom_type := (183,173,163,154,145,137,129,122,115,109,102,97,91,86,81,77);
 	constant period_rom : period_rom_type := (91,86,81,77,72,68,64,61,57,54,51,48,45,43,40,38);
 	
 
-	-- Add more signals if needed
+	
 
 begin
 
@@ -94,16 +93,11 @@ begin
 	
 		if flg = X"F" then		--Use all flag bits for pcm_valid 
 			ce <= '1';
+			curr_tone <= period_rom(to_integer(idx));
 		else
 			ce <= '0';
 		end if;
 		
-		if curr_tone /= period_rom(to_integer(idx)) then
-			new_tone <= '1';
-			curr_tone <= period_rom(to_integer(idx));
-		else
-			new_tone <= '0';
-		end if;
 	end if;
 	end process tone_selection;
 

@@ -1,0 +1,9 @@
+reset: br >main
+nop
+hardfault: reti
+nop
+memfault: reti
+nop
+
+main: br always >main
+	nop

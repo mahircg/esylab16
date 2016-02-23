@@ -36,6 +36,7 @@ assembler/obj/*
 assembler/asm
 assembler/test.ram
 assembler/test.map
+ise/*
 
 ### test program files
 *.ram
